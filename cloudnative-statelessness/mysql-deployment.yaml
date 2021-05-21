@@ -1,7 +1,13 @@
-kind: Service
+# mysql-deployment.yaml   -   from the kubernetes tutorial
+# ---------------------
+# https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/
+# This is the manifest file for creating the mysql service.
+# make sure the persistent volume claim mysql-pv-claim.yaml 
+# is deployed first!
 apiVersion: v1
+kind: Service
 metadata:
-  name: mysql-svc
+  name: mysql
 spec:
   selector:
     app: mysql
@@ -11,28 +17,35 @@ spec:
     targetPort: 3306
   type: NodePort
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
-  labels:
-    app: mysql
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: mysql
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
         app: mysql
     spec:
       containers:
-      - name: mysql
-        image: mysql:5.7.22
+      - image: mysql:5.6
+        name: mysql
         env:
-          - name: MYSQL_ROOT_PASSWORD
-            value: password
+          # Use secret in real usage
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
         ports:
-          - containerPort: 3306
-            name: mysql
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim

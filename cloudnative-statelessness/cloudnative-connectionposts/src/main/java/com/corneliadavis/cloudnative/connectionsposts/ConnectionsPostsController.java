@@ -102,27 +102,36 @@ public class ConnectionsPostsController {
             } else {
 
                 ArrayList<PostSummary> postSummaries = new ArrayList<PostSummary>();
-                logger.info(Utils.ipTag(ip, p) + "getting posts for user network " + username);
+                logger.info(Utils.ipTag(ip, p) + "getting posts for user network '" + username + "'");
 
                 String ids = "";
                 RestTemplate restTemplate = new RestTemplate();
 
                 // get connections
+                logger.info(Utils.ipTag(ip, p) + "connectionsUrl + username = '" + connectionsUrl + username + "'");
+                logger.info(Utils.ipTag(ip, p) + "usersUrl + username = '" + usersUrl + username + "'");
                 ResponseEntity<ConnectionResult[]> respConns = restTemplate.getForEntity(connectionsUrl + username, ConnectionResult[].class);
                 ConnectionResult[] connections = respConns.getBody();
                 for (int i = 0; i < connections.length; i++) {
                     if (i > 0) ids += ",";
                     ids += connections[i].getFollowed().toString();
                 }
-                logger.info(Utils.ipTag(ip, p) + "connections = " + ids);
+                logger.info(Utils.ipTag(ip, p) + "connections = '" + ids + "'");
+                if (ids == null || ids.isEmpty()) {
+                    logger.warn(Utils.ipTag(ip, p) + "ids are empty. May cause NPE. Check database.");
+                }
 
                 // get posts for those connections
+                logger.info(Utils.ipTag(ip, p) + "postsUrl + ids = '" + postsUrl + ids + "'");
                 ResponseEntity<PostResult[]> respPosts = restTemplate.getForEntity(postsUrl + ids, PostResult[].class);
                 PostResult[] posts = respPosts.getBody();
 
-                for (int i = 0; i < posts.length; i++)
+                for (int i = 0; i < posts.length; i++) {
                     postSummaries.add(new PostSummary(getUsersname(posts[i].getUserId()), posts[i].getTitle(), posts[i].getDate()));
-
+                }
+                logger.info(Utils.ipTag(ip, p) + "Posts        : " + posts.length);
+                logger.info(Utils.ipTag(ip, p) + "PostSummaries: " + postSummaries.size());
+                
                 return postSummaries;
             }
         }
@@ -131,7 +140,7 @@ public class ConnectionsPostsController {
 
     private String getUsersname(Long id) {
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<UserResult> resp = restTemplate.getForEntity(usersUrl+id, UserResult.class);
+        ResponseEntity<UserResult> resp = restTemplate.getForEntity(usersUrl + id, UserResult.class);
         return resp.getBody().getName();
     }
 }

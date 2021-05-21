@@ -11,7 +11,7 @@ spec:
     targetPort: 8080
   type: NodePort
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: connections
@@ -29,7 +29,8 @@ spec:
     spec:
       containers:
       - name: connections
-        image: cdavisafc/cloudnative-statelessness-connections
+        image: aldorbregosson/cloudnative-statelessness-connections
+        imagePullPolicy: "Always"
         env:
           - name: INSTANCE_IP
             valueFrom:
@@ -38,4 +39,4 @@ spec:
           - name: PORT
             value: "8080"
           - name: SPRING_APPLICATION_JSON
-            value: '{"spring":{"datasource":{"url":"<insert jdbc url here>"}}}'
+            value: '{"spring":{"datasource":{"url":"jdbc:mysql://192.168.49.2:32076/cookbook"}}}'

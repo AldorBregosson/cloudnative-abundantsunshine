@@ -11,7 +11,7 @@ spec:
     targetPort: 8080
   type: NodePort
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: connectionsposts
@@ -29,7 +29,8 @@ spec:
     spec:
       containers:
       - name: connectionsposts
-        image: cdavisafc/cloudnative-statelessness-connectionsposts-stateless
+        image: aldorbregosson/cloudnative-statelessness-connectionposts-stateless:latest
+        imagePullPolicy: "Always"
         env:
           - name: INSTANCE_IP
             valueFrom:
@@ -38,12 +39,12 @@ spec:
           - name: PORT
             value: "8080"
           - name: CONNECTIONPOSTSCONTROLLER_POSTSURL
-            value: "http://192.168.99.100:32145/posts?userIds="
+            value: "http://192.168.49.2:31236/posts?userIds="
           - name: CONNECTIONPOSTSCONTROLLER_CONNECTIONSURL
-            value: "http://192.168.99.100:30967/connections/"
+            value: "http://192.168.49.2:30680/connections/"
           - name: CONNECTIONPOSTSCONTROLLER_USERSURL
-            value: "http://192.168.99.100:30967/users/"
+            value: "http://192.168.49.2:30680/users/"
           - name: REDIS_HOSTNAME
-            value: "192.168.99.100"
+            value: "192.168.49.2"
           - name: REDIS_PORT
-            value: "31133"
+            value: "31721"
