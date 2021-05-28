@@ -70,6 +70,10 @@ public class ConnectionsPostsController {
     private String postsUrl;
     @Value("${connectionpostscontroller.usersUrl}")
     private String usersUrl;
+    @Value("${com.corneliadavis.cloudnative.posts.secret}")
+    private String postsSecret;
+    @Value("${com.corneliadavis.cloudnative.connections.secret}")
+    private String connectionsSecret;
 
     private StringRedisTemplate template;
 
@@ -103,21 +107,34 @@ public class ConnectionsPostsController {
                 RestTemplate restTemplate = new RestTemplate();
 
                 // get connections
-                ResponseEntity<ConnectionResult[]> respConns = restTemplate.getForEntity(connectionsUrl + username, ConnectionResult[].class);
+                String secretQueryParam = "?secret=" + connectionsSecret;
+                ResponseEntity<ConnectionResult[]> respConns =
+                    restTemplate.getForEntity(
+                        connectionsUrl + username + secretQueryParam,
+                        ConnectionResult[].class);
                 ConnectionResult[] connections = respConns.getBody();
                 for (int i = 0; i < connections.length; i++) {
                     if (i > 0) ids += ",";
                     ids += connections[i].getFollowed().toString();
                 }
-                logger.info(utils.ipTag() + "connections = " + ids);
+                logger.info(utils.ipTag() + "connections = '" + ids + "'");
 
                 // get posts for those connections
-                ResponseEntity<PostResult[]> respPosts = restTemplate.getForEntity(postsUrl + ids, PostResult[].class);
+                secretQueryParam = "&secret=" + postsSecret;
+                ResponseEntity<PostResult[]> respPosts =
+                    restTemplate.getForEntity(
+                        postsUrl + ids + secretQueryParam,
+                        PostResult[].class);
                 PostResult[] posts = respPosts.getBody();
 
-                for (int i = 0; i < posts.length; i++)
-                    postSummaries.add(new PostSummary(getUsersname(posts[i].getUserId()), posts[i].getTitle(), posts[i].getDate()));
-
+                for (int i = 0; i < posts.length; i++) {
+                    postSummaries.add(
+                        new PostSummary(
+                            getUsersname(posts[i].getUserId()),
+                            posts[i].getTitle(),
+                            posts[i].getDate()));
+                }
+                
                 return postSummaries;
             }
         }

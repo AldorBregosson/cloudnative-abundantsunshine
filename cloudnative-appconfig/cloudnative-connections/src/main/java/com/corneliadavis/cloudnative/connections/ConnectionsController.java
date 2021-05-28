@@ -15,6 +15,9 @@ public class ConnectionsController {
     private UserRepository userRepository;
     private ConnectionRepository connectionRepository;
     
+    @Value("${com.corneliadavis.cloudnative.connections.secret}")
+    private String configuredSecret;
+    
     @Autowired
     Utils utils;
 
@@ -76,13 +79,26 @@ public class ConnectionsController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value="/connections/{username}")
-    public Iterable<Connection> getConnections(@PathVariable("username") String username, HttpServletResponse response) {
-        logger.info(utils.ipTag() + "getting connections for username " + username);
+    public Iterable<Connection> getConnections(
+        @PathVariable("username") String username,
+        @RequestParam(value="secret", required=true) String secret,
+        HttpServletResponse response) {
+        logger.info(utils.ipTag() + "getting connections for username '" + username + "'");
         Long userId = getByUsername(username, null).getId();
         Iterable<Connection> connections;
-        connections = connectionRepository.findByFollower(userId);
-
-        return connections;
+    
+        if (secret.equals(configuredSecret)) {
+            // Never do this in productive apps (writing passwords to logs).
+            logger.info(utils.ipTag() + "Accessing connections using secret '" + secret + "'");
+            connections = connectionRepository.findByFollower(userId);
+            return connections;
+        } else {
+            logger.warn(utils.ipTag() +
+                "Attempt to access Connection service with secret '" + secret
+                + "' (expecting '" + configuredSecret + "')");
+            response.setStatus(401);
+            return null;
+        }
     }
 
     @RequestMapping(method = RequestMethod.POST, value="/connections")
