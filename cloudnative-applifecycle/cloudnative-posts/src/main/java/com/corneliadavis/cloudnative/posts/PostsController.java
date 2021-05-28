@@ -1,16 +1,18 @@
 package com.corneliadavis.cloudnative.posts;
 
+import com.corneliadavis.cloudnative.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.web.bind.annotation.*;
-import com.corneliadavis.cloudnative.Utils;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.Set;
 
 @RefreshScope
 @RestController
@@ -22,7 +24,9 @@ public class PostsController {
     private boolean isHealthy = true;
 
     @Autowired
-    public PostsController(PostRepository postRepository) { this.postRepository = postRepository; }
+    public PostsController(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 
     @Autowired
     Utils utils;

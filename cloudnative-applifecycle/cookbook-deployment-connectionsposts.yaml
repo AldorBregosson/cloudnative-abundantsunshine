@@ -42,18 +42,18 @@ spec:
               fieldRef:
                 fieldPath: status.podIP
           - name: CONNECTIONPOSTSCONTROLLER_POSTSURL
-            value: "http://192.168.99.100:32119/posts?userIds="
+            value: "http://192.168.49.2:30760/posts?userIds="
           - name: CONNECTIONPOSTSCONTROLLER_CONNECTIONSURL
-            value: "http://192.168.99.100:30955/connections/"
+            value: "http://192.168.49.2:32311/connections/"
           - name: CONNECTIONPOSTSCONTROLLER_USERSURL
-            value: "http://192.168.99.100:30955/users/"
+            value: "http://192.168.49.2:32311/users/"
           - name: REDIS_HOSTNAME
-            value: "192.168.99.100"
+            value: "192.168.49.2"
           - name: REDIS_PORT
-            value: "31537"
+            value: "30054"
           - name: SPRING_APPLICATION_NAME
             value: "mycookbook"
           - name: SPRING_CLOUD_CONFIG_URI
-            value: "http://192.168.99.100:30455"
+            value: "http://192.168.49.2:32070"
           - name: VERSIONING_TRIGGER
             value: "2"
