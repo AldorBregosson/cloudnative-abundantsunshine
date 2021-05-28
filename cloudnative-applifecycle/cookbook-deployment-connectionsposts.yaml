@@ -11,7 +11,7 @@ spec:
     targetPort: 8080
   type: NodePort
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: connectionsposts
@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
       - name: connectionsposts
-        image: cdavisafc/cloudnative-applifecycle-connectionposts:0.0.2
+        image: aldorbregosson/cloudnative-applifecycle-connectionposts:0.0.2
         livenessProbe:
           httpGet:
             path: /healthz
