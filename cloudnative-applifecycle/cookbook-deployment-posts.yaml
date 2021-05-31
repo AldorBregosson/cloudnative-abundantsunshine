@@ -42,10 +42,10 @@ spec:
               fieldRef:
                 fieldPath: status.podIP
           - name: SPRING_APPLICATION_JSON
-            value: '{"spring":{"datasource":{"url":"jdbc:mysql://192.168.49.2:32023/cookbook"}}}'
+            value: '{"spring":{"datasource":{"url":"jdbc:mysql://192.168.49.2:30674/cookbook"}}}'
           - name: SPRING_APPLICATION_NAME
             value: "mycookbook"
           - name: SPRING_CLOUD_CONFIG_URI
-            value: "http://192.168.49.2:32070"
+            value: "http://192.168.49.2:30567"
           - name: VERSIONING_TRIGGER
             value: "1"

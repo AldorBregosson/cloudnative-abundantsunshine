@@ -15,46 +15,56 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Utils implements ApplicationContextAware, ApplicationListener<ApplicationEvent> {
-
+    
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+    
     private ApplicationContext applicationContext;
+    
     private int port;
+    
     @Value("${ipaddress}")
     private String ip;
+    
     @Value("${com.corneliadavis.cloudnative.posts.secrets}")
     private String configuredSecretsIn;
+    
     private Set<String> configSecrets;
-
-    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
-
+    
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-
+    
     @Override
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
-
+        
         if (applicationEvent instanceof ServletWebServerInitializedEvent) {
             ServletWebServerInitializedEvent servletWebServerInitializedEvent
-                    = (ServletWebServerInitializedEvent) applicationEvent;
+                = (ServletWebServerInitializedEvent) applicationEvent;
             this.port = servletWebServerInitializedEvent.getApplicationContext().getWebServer().getPort();
         } else if (applicationEvent instanceof ApplicationPreparedEvent) {
             configSecrets = new HashSet<>();
             String secrets[] = configuredSecretsIn.split(",");
-            for (int i=0; i<secrets.length; i++)
+            for (int i = 0; i < secrets.length; i++) {
                 configSecrets.add(secrets[i].trim());
+            }
             logger.info(ipTag() + "Posts Service initialized with secret(s): " + configuredSecretsIn);
         }
     }
-
-    public String ipTag() { return "[" + ip + ":" + port +"] "; }
-
-    public boolean isValidSecret(String secret) { return configSecrets.contains(secret); }
-
+    
+    public String ipTag() {
+        return "[" + ip + ":" + port + "] ";
+    }
+    
+    public boolean isValidSecret(String secret) {
+        return configSecrets.contains(secret);
+    }
+    
     public String validSecrets() {
         String result = "";
-        for (String s : configSecrets)
+        for (String s : configSecrets) {
             result += s + ",";
+        }
         return result;
     }
 }
