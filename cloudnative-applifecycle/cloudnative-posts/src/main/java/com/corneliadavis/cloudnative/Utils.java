@@ -43,6 +43,7 @@ public class Utils implements ApplicationContextAware, ApplicationListener<Appli
                 = (ServletWebServerInitializedEvent) applicationEvent;
             this.port = servletWebServerInitializedEvent.getApplicationContext().getWebServer().getPort();
         } else if (applicationEvent instanceof ApplicationPreparedEvent) {
+            // meaning: the application has been fully initialized.
             configSecrets = new HashSet<>();
             String secrets[] = configuredSecretsIn.split(",");
             for (int i = 0; i < secrets.length; i++) {

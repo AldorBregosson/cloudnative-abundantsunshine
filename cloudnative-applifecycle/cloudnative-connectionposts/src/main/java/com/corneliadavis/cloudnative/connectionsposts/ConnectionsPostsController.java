@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @RefreshScope
 @RestController
@@ -68,8 +69,10 @@ public class ConnectionsPostsController {
 
     @Value("${connectionpostscontroller.connectionsUrl}")
     private String connectionsUrl;
+    
     @Value("${connectionpostscontroller.postsUrl}")
     private String postsUrl;
+    
     @Value("${connectionpostscontroller.usersUrl}")
     private String usersUrl;
 
@@ -99,14 +102,15 @@ public class ConnectionsPostsController {
                 response.setStatus(401);
             } else {
 
-                ArrayList<PostSummary> postSummaries = new ArrayList<PostSummary>();
+                List<PostSummary> postSummaries = new ArrayList<PostSummary>();
                 logger.info(utils.ipTag() + "getting posts for user network " + username);
 
                 String ids = "";
                 RestTemplate restTemplate = new RestTemplate();
 
-                // get connections
+                // Accesses the connections secret configured into the app
                 String secretQueryParam = "?secret=" + utils.getConnectionsSecret();
+                // get connections
                 ResponseEntity<ConnectionResult[]> respConns = restTemplate.getForEntity(connectionsUrl + username + secretQueryParam, ConnectionResult[].class);
                 ConnectionResult[] connections = respConns.getBody();
                 for (int i = 0; i < connections.length; i++) {
@@ -114,15 +118,24 @@ public class ConnectionsPostsController {
                     ids += connections[i].getFollowed().toString();
                 }
                 logger.info(utils.ipTag() + "connections = " + ids);
-
+    
+                // Accesses the posts secret configured into the app
                 secretQueryParam = "&secret=" + utils.getPostsSecret();
                 // get posts for those connections
                 ResponseEntity<PostResult[]> respPosts = restTemplate.getForEntity(postsUrl + ids + secretQueryParam, PostResult[].class);
                 PostResult[] posts = respPosts.getBody();
+                logger.info(utils.ipTag() + "          posts: " + posts.length);
 
-                for (int i = 0; i < posts.length; i++)
-                    postSummaries.add(new PostSummary(getUsersname(posts[i].getUserId()), posts[i].getTitle(), posts[i].getDate()));
-
+                for (int i = 0; i < posts.length; i++) {
+                    postSummaries.add(
+                        new PostSummary(
+                            getUsersname(posts[i].getUserId()),
+                            posts[i].getTitle(),
+                            posts[i].getDate()
+                        )
+                    );
+                }
+                logger.info(utils.ipTag() + "posts summaries: " + postSummaries.size());
                 return postSummaries;
             }
         }
@@ -136,8 +149,7 @@ public class ConnectionsPostsController {
         else response.setStatus(500);
 
     }
-
-
+    
     private String getUsersname(Long id) {
         RestTemplate restTemplate = new RestTemplate();
         String secretQueryParam = "?secret=" + utils.getConnectionsSecret();

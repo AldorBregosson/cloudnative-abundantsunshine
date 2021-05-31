@@ -44,8 +44,8 @@ public class Utils implements ApplicationContextAware, ApplicationListener<Appli
                     = (ServletWebServerInitializedEvent) applicationEvent;
             this.port = servletWebServerInitializedEvent.getApplicationContext().getWebServer().getPort();
         } else if (applicationEvent instanceof ApplicationPreparedEvent) {
-            connectionsSecret = connectionsSecretsIn.split(",")[0];
-            postsSecret = postsSecretsIn.split(",")[0];
+            connectionsSecret = connectionsSecretsIn.split(",")[0]; // take only the most recent secret.
+            postsSecret = postsSecretsIn.split(",")[0];             // must be the first position in the config file's list.
             logger.info(ipTag() + "Connection Posts Service initialized with Post secret: " + postsSecret + " and Connections secret: " + connectionsSecret);
         }
     }
