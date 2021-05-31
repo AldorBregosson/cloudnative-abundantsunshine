@@ -18,10 +18,13 @@ public class Utils implements ApplicationContextAware, ApplicationListener<Appli
 
     private ApplicationContext applicationContext;
     private int port;
+    
     @Value("${ipaddress}")
     private String ip;
+    
     @Value("${com.corneliadavis.cloudnative.connections.secrets}")
     private String configuredSecretsIn;
+    
     private Set<String> configSecrets;
 
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);

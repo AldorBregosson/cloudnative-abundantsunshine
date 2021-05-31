@@ -15,13 +15,18 @@ public class Utils implements ApplicationContextAware, ApplicationListener<Appli
 
     private ApplicationContext applicationContext;
     private int port;
+    
     @Value("${ipaddress}")
     private String ip;
+    
     @Value("${com.corneliadavis.cloudnative.connections.secrets}")
     private String connectionsSecretsIn;
+    
     private String connectionsSecret;
+    
     @Value("${com.corneliadavis.cloudnative.posts.secrets}")
     private String postsSecretsIn;
+    
     private String postsSecret;
 
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
@@ -52,7 +57,9 @@ public class Utils implements ApplicationContextAware, ApplicationListener<Appli
     public String getPostsSecret() {
         return postsSecret;
     }
-
-    public String ipTag() { return "[" + ip + ":" + port +"] "; }
+    
+    public String ipTag() {
+        return "[" + ip + ":" + port + "] ";
+    }
 
 }
