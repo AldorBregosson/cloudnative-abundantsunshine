@@ -82,7 +82,17 @@ public class PostsController {
         }
 
     }
-
+    
+    /**
+     * Checks the health of this service. This is a health endpoint that
+     * can be checked at regular intervals. When it’s set to true (the default),
+     * it returns a success status code, and when it’s set to false,
+     * the application sleeps for a long time, effectively rendering it unresponsive.
+     * We then have an app that’s in the 'Started and Unresponsive' state,
+     *
+     * @param response the HTTP Response
+     * @throws InterruptedException
+     */
     @RequestMapping(method = RequestMethod.GET, value="/healthz")
     public void healthCheck(HttpServletResponse response) throws InterruptedException {
 
@@ -90,7 +100,12 @@ public class PostsController {
         else Thread.sleep(400000);
 
     }
-
+    
+    /**
+     * Renders this service unresponsive, i.e. it "infects" the service.
+     *
+     * @param response the HTTP response.
+     */
     @RequestMapping(method = RequestMethod.POST, value="/infect")
     public void makeUnhealthy(HttpServletResponse response) {
 

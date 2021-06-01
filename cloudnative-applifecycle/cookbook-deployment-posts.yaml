@@ -30,12 +30,13 @@ spec:
       containers:
       - name: posts
         image: aldorbregosson/cloudnative-applifecycle-posts:0.0.2
+        # configures the control loop that continuously polls the health endpoint
         livenessProbe:
           httpGet:
             path: /healthz
             port: 8080
-          initialDelaySeconds: 60
-          periodSeconds: 5
+          initialDelaySeconds: 60   # give app 60 seconds to start up properly
+          periodSeconds: 5          # then poll it every 5 seconds.
         env:
           - name: INSTANCE_IP
             valueFrom:
@@ -48,4 +49,4 @@ spec:
           - name: SPRING_CLOUD_CONFIG_URI
             value: "http://192.168.49.2:30567"
           - name: VERSIONING_TRIGGER
-            value: "1"
+            value: "3"

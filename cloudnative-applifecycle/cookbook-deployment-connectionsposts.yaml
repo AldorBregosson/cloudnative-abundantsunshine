@@ -56,4 +56,4 @@ spec:
           - name: SPRING_CLOUD_CONFIG_URI
             value: "http://192.168.49.2:30567"
           - name: VERSIONING_TRIGGER
-            value: "2"
+            value: "3"
