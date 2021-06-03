@@ -58,7 +58,7 @@ public class PostsController {
 
             }
         } else {
-            logger.info(utils.ipTag() + ".Attempt to access Post service with secret " + secret + " (expecting one of " + utils.validSecrets() + ")");
+            logger.info(utils.ipTag() + "Attempt to access Post service with secret " + secret + " (expecting one of " + utils.validSecrets() + ")");
             response.setStatus(401);
             return null;
         }
