@@ -1,17 +1,17 @@
-kind: Service
+kind: Service # Defines the (abstract) service
 apiVersion: v1
 metadata:
-  name: posts-svc
+  name: posts-svc # the name under which other services can discover this service.
 spec:
-  selector:
-    app: posts
+  selector:    # the selector designates the list of instances that this service represents
+    app: posts # that selector designates all app instances with the tag app:posts.
   ports:
   - protocol: "TCP"
     port: 80
     targetPort: 8080
   type: NodePort
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1   # v1beta1 is no longer accepted
 kind: Deployment
 metadata:
   name: posts
@@ -25,28 +25,29 @@ spec:
   template:
     metadata:
       name: posts
-      labels:
-        app: posts
+      labels:      # the app instances are labeled with the tag app:posts.
+        app: posts # when Kubernetes launches an app instance, it attaches this metadata to it.
     spec:
       containers:
       - name: posts
-        image: cdavisafc/cloudnative-applifecycle-posts:0.0.2
+        image: aldorbregosson/cloudnative-applifecycle-posts:0.0.2
+        # configures the control loop that continuously polls the health endpoint.
         livenessProbe:
           httpGet:
-            path: /healthz
+            path: /healthz         # the health endpoint
             port: 8080
-          initialDelaySeconds: 60
-          periodSeconds: 5
+          initialDelaySeconds: 60  # give app 60 seconds to start up properly,
+          periodSeconds: 5         # then poll it every 5 seconds.
         env:
-          - name: INSTANCE_IP
+          - name: INSTANCE_IP      # the env variable that holds the IP address of an instance.
             valueFrom:
               fieldRef:
-                fieldPath: status.podIP
+                fieldPath: status.podIP  # get the IP address of the pod that runs the instance.
           - name: SPRING_APPLICATION_JSON
-            value: '{"spring":{"datasource":{"url":"jdbc:mysql://mysql-svc/cookbook"}}}'
+            value: '{"spring":{"datasource":{"url":"jdbc:mysql://mysql-svc/cookbook?useSSL=false"}}}'
           - name: SPRING_APPLICATION_NAME
             value: "mycookbook"
           - name: SPRING_CLOUD_CONFIG_URI
             value: "http://sccs-svc:8888"
-          - name: VERSIONING_TRIGGER
+          - name: VERSIONING_TRIGGER # an env variable to trigger Kubernetes to update all instances of the app.
             value: "4"
