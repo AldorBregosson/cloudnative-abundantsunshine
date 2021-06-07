@@ -57,3 +57,17 @@ spec:
             value: "http://sccs-svc:8888"
           - name: VERSIONING_TRIGGER
             value: "1"
+---
+# to make service accessible 'from the outside'
+apiVersion: v1
+kind: Service
+metadata:
+  name: connectionsposts-lb
+spec:
+  selector:
+    app: connectionsposts
+  type: LoadBalancer
+  ports:
+    - protocol: "TCP"
+      port: 80
+      targetPort: 8080
