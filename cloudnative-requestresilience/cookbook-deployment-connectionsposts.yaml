@@ -67,3 +67,17 @@ spec:
             value: "http://sccs-svc:8888"
           - name: VERSIONING_TRIGGER
             value: "1"
+---
+# to make service accessible 'from the outside'
+apiVersion: v1
+kind: Service
+metadata:
+  name: connectionsposts-lb   # I want a load balancer service for connectionsposts
+spec:
+  selector:
+    app: connectionsposts     # the app selector (label) for which we want it.
+  type: LoadBalancer
+  ports:
+    - protocol: "TCP"
+      port: 80          # the external port under which we want to talk to the app
+      targetPort: 8080  # the internal target port to map it to.
