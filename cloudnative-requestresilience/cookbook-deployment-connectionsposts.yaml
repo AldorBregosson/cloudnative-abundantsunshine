@@ -9,7 +9,7 @@ spec:
   - protocol: "TCP"
     port: 80
     targetPort: 8080
-  type: LoadBalancer
+  type: LoadBalancer   # for access 'from outside' Kubernetes
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: connectionsposts
-        image: cdavisafc/cloudnative-requestresilience-connectionposts:0.0.1
+        image: aldorbregosson/cloudnative-requestresilience-connectionposts:0.0.1
 #        resources:
 #          limits:
 #            memory: "2048Mi"
