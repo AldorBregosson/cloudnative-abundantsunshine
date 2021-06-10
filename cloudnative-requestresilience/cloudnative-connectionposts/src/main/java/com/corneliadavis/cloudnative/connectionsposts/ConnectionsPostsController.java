@@ -22,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @RefreshScope
 @RestController
@@ -32,6 +33,8 @@ public class ConnectionsPostsController implements InitializingBean {
     Utils utils;
     @Autowired
     RestTemplateBuilder restTemplateBuilder;
+    
+    // environment parameters from properties file.
     @Value("${connectionpostscontroller.connectionsUrl}")
     private String connectionsUrl;
     @Value("${connectionpostscontroller.postsUrl}")
@@ -76,7 +79,7 @@ public class ConnectionsPostsController implements InitializingBean {
                 return null;
             } else {
                 
-                ArrayList<PostSummary> postSummaries = new ArrayList<PostSummary>();
+                List<PostSummary> postSummaries = new ArrayList<>();
                 logger.info(utils.ipTag() + "getting posts for user network " + username);
                 
                 String ids = "";
@@ -112,16 +115,20 @@ public class ConnectionsPostsController implements InitializingBean {
                         } else {
                             logger.info(utils.ipTag() + "Retrieved results from database");
                             PostResult[] posts = respPosts.getBody();
-                            for (int i = 0; i < posts.length; i++)
+                            logger.info(utils.ipTag() + "         Posts: " + posts.length);
+                            for (int i = 0; i < posts.length; i++) {
                                 postSummaries.add(new PostSummary(getUsersname(posts[i].getUserId()), posts[i].getTitle(), posts[i].getDate()));
+                            }
+                            logger.info(utils.ipTag() + "Post Summaries: " + postSummaries.size());
                             return postSummaries;
                         }
                     } catch (Exception e) {
                         // Will occur when a connection times out. For this naive implementation, we will simply
                         // try again.
                         logger.info(utils.ipTag() + "On (" + retryCount + ") request to unhealthy posts service  " + e.getMessage());
-                        if (implementRetries)
+                        if (implementRetries) {
                             retryCount++;
+                        }
                         else {
                             logger.info(utils.ipTag() + "Not implementing retries - returning with a 500");
                             response.setStatus(500);
@@ -194,3 +201,4 @@ public class ConnectionsPostsController implements InitializingBean {
         }
     }
 }
+
