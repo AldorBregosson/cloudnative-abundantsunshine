@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: connections
-        image: cdavisafc/cloudnative-requestresilience-connections:0.0.1
+        image: aldorbregosson/cloudnative-requestresilience-connections:0.0.1
         livenessProbe:
           httpGet:
             path: /healthz
@@ -43,10 +43,10 @@ spec:
               fieldRef:
                 fieldPath: status.podIP
           - name: SPRING_APPLICATION_JSON
-            value: '{"spring":{"datasource":{"url":"jdbc:mysql://mysql-svc/cookbook"}}}'
+            value: '{"spring":{"datasource":{"url":"jdbc:mysql://mysql-svc/cookbook?useSSL=false"}}}'
           - name: SPRING_APPLICATION_NAME
             value: "mycookbook"
           - name: SPRING_CLOUD_CONFIG_URI
             value: "http://sccs-svc:8888"
           - name: VERSIONING_TRIGGER
-            value: "1"
+            value: "3"

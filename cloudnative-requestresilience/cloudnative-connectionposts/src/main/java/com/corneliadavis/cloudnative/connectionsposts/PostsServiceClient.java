@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PostsServiceClient {
@@ -27,10 +28,12 @@ public class PostsServiceClient {
     @Autowired
     Utils utils;
 
-    @Retryable( value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
-    public ArrayList<PostSummary> getPosts(String ids, RestTemplate restTemplate) throws Exception {
+    @Retryable( value = Exception.class,
+                maxAttempts = 3,
+                backoff = @Backoff(delay = 1000) )
+    public List<PostSummary> getPosts(String ids, RestTemplate restTemplate) throws Exception {
 
-        ArrayList<PostSummary> postSummaries = new ArrayList<PostSummary>();
+        List<PostSummary> postSummaries = new ArrayList<>();
 
         String secretQueryParam = "&secret=" + utils.getPostsSecret();
 
@@ -41,8 +44,10 @@ public class PostsServiceClient {
             throw new HttpServerErrorException(respPosts.getStatusCode(), "Exception thrown in obtaining Posts");
         } else {
             ConnectionsPostsController.PostResult[] posts = respPosts.getBody();
-            for (int i = 0; i < posts.length; i++)
+            logger.info(utils.ipTag() + "         Posts: " + posts.length);
+            for (int i = 0; i < posts.length; i++) {
                 postSummaries.add(new PostSummary(getUsersname(posts[i].getUserId(), restTemplate), posts[i].getTitle(), posts[i].getDate()));
+            }
             return postSummaries;
         }
 
@@ -53,6 +58,5 @@ public class PostsServiceClient {
         ResponseEntity<ConnectionsPostsController.UserResult> resp = restTemplate.getForEntity(usersUrl + id + secretQueryParam, ConnectionsPostsController.UserResult.class);
         return resp.getBody().getName();
     }
-
-
+    
 }
