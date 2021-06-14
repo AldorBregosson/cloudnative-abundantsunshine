@@ -17,6 +17,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PostsServiceClient {
@@ -27,6 +28,7 @@ public class PostsServiceClient {
 
     @Value("${connectionpostscontroller.postsUrl}")
     private String postsUrl;
+    
     @Value("${connectionpostscontroller.usersUrl}")
     private String usersUrl;
 
@@ -38,38 +40,51 @@ public class PostsServiceClient {
         this.postResultsRepository = postResultsRepository;
     }
 
-    @Retryable( value = ResourceAccessException.class, maxAttempts = 3, backoff = @Backoff(delay = 500))
-    public ArrayList<PostSummary> getPosts(String ids, RestTemplate restTemplate) throws Exception {
+    @Retryable( value = ResourceAccessException.class,
+                maxAttempts = 3,
+                backoff = @Backoff(delay = 500))
+    public List<PostSummary> getPosts(String ids, RestTemplate restTemplate) throws Exception {
 
-        ArrayList<PostSummary> postSummaries = new ArrayList<PostSummary>();
+        List<PostSummary> postSummaries = new ArrayList<>();
 
         String secretQueryParam = "&secret=" + utils.getPostsSecret();
 
         logger.info("Trying getPosts: " + postsUrl + ids + secretQueryParam);
 
-        ResponseEntity<ConnectionsPostsController.PostResult[]> respPosts = restTemplate.getForEntity(postsUrl + ids + secretQueryParam, ConnectionsPostsController.PostResult[].class);
+        ResponseEntity<ConnectionsPostsController.PostResult[]> respPosts =
+            restTemplate.getForEntity(postsUrl + ids + secretQueryParam,
+                                      ConnectionsPostsController.PostResult[].class);
+        
         if (respPosts.getStatusCode().is5xxServerError()) {
             throw new HttpServerErrorException(respPosts.getStatusCode(), "Exception thrown in obtaining Posts");
         } else {
             ConnectionsPostsController.PostResult[] posts = respPosts.getBody();
-            for (int i = 0; i < posts.length; i++)
-                postSummaries.add(new PostSummary(getUsersname(posts[i].getUserId(), restTemplate), posts[i].getTitle(), posts[i].getDate()));
+            for (int i = 0; i < posts.length; i++) {
+                postSummaries.add(
+                    new PostSummary(getUsersname(posts[i].getUserId(), restTemplate),
+                                    posts[i].getTitle(),
+                                    posts[i].getDate()
+                    )
+                );
+            }
+            // thinking ahead to darker days, cache the result.
             ObjectMapper objectMapper = new ObjectMapper();
             String postSummariesJson = objectMapper.writeValueAsString(postSummaries);
-            PostResults postResults = new PostResults(ids, postSummariesJson);
-            postResultsRepository.save(postResults);
-            return postSummaries;
+            PostResults postResults = new PostResults(ids, postSummariesJson); // classical instantiation, therefore the constructor of PostResults is not @Autowired.
+            postResultsRepository.save(postResults);  // first, cache the result,
+            return postSummaries;                     // then return it to the caller.
         }
 
     }
 
     @Recover
-    public ArrayList<PostSummary> returnCached(ResourceAccessException e, String ids, RestTemplate restTemplate) throws Exception {
+    public List<PostSummary> returnCached(ResourceAccessException e,
+                                          String ids, RestTemplate restTemplate) throws Exception {
         logger.info("Failed to connect to or obtain results from Posts service - returning cached results");
 
         PostResults postResults = postResultsRepository.findById(ids).get();
         ObjectMapper objectMapper = new ObjectMapper();
-        ArrayList<PostSummary> postSummaries;
+        List<PostSummary> postSummaries;
         try {
             postSummaries = objectMapper.readValue(postResults.getSummariesJson(), new TypeReference<ArrayList<PostSummary>>() {});
         } catch (Exception ec) {
@@ -85,6 +100,5 @@ public class PostsServiceClient {
         ResponseEntity<ConnectionsPostsController.UserResult> resp = restTemplate.getForEntity(usersUrl + id + secretQueryParam, ConnectionsPostsController.UserResult.class);
         return resp.getBody().getName();
     }
-
-
+    
 }
