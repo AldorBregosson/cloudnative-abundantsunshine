@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/local/bin/bash
 if [ $1 == "add" ]; then
     action="breaking"
 else
