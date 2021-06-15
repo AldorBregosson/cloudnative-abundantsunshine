@@ -24,11 +24,14 @@ public class PostsController {
     private long healthTimeout = 0;
 
     @Autowired
-    public PostsController(PostRepository postRepository) { this.postRepository = postRepository; }
+    public PostsController(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 
     @Autowired
     Utils utils;
-
+    
+    /** The main logic of the service. */
     @Autowired
     PostsService postsService;
 
@@ -43,6 +46,8 @@ public class PostsController {
                                            HttpServletResponse response) throws InterruptedException {
 
         long currentMillis = System.currentTimeMillis();
+        // healthTimeout can be set to (current time + a big number) through the /infect endpoint,
+        // so that a GET request to /posts will not return for the sleepDuration.
         if (currentMillis < healthTimeout) {
             Thread.sleep(sleepDuration);
             return null;
@@ -60,8 +65,7 @@ public class PostsController {
             response.setStatus(401);
             return null;
         }
-
-
+        
     }
 
     @RequestMapping(method = RequestMethod.POST, value="/posts")

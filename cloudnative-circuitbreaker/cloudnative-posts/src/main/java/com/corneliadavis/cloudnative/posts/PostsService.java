@@ -14,8 +14,12 @@ import java.security.AccessControlException;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
+/**
+ * The main logic of the app. Here the Hystrix circuit breaker is established.
+ */
 @Service
 public class PostsService {
 
@@ -25,7 +29,9 @@ public class PostsService {
     private long healthTimeout = 0;
 
     @Autowired
-    public PostsService(PostRepository postRepository) { this.postRepository = postRepository; }
+    public PostsService(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 
     @Autowired
     Utils utils;
@@ -48,7 +54,7 @@ public class PostsService {
             posts = postRepository.findAll();
             return posts;
         } else {
-            ArrayList<Post> postsForUsers = new ArrayList<Post>();
+            List<Post> postsForUsers = new ArrayList<>();
             String userId[] = userIds.split(",");
             for (int i = 0; i < userId.length; i++) {
                 logger.info(utils.ipTag() + "getting posts for userId " + userId[i]);
