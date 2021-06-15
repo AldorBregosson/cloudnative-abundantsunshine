@@ -4,3 +4,5 @@ kubectl apply -f redis-deployment.yaml
 kubectl apply -f mysql-deployment.yaml
 # after creating mysql must create the cookbook database
 
+
+

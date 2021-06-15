@@ -11,3 +11,4 @@ if [ "$1" = "all" ]; then
 else
 	echo "mysql, redis and other services may still be running"
 fi
+
