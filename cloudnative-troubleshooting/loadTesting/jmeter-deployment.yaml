@@ -24,3 +24,4 @@ spec:
           configMap:
             defaultMode: 420
             name: zipkin-jmeter-config
+

@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: connectionsposts
-        image: aldorbregosson/cloudnative-troubleshooting-connectionposts:latest
+        image: aldorbregosson/cloudnative-troubleshooting-connectionposts:0.0.2
         env:
           - name: INSTANCE_IP
             valueFrom:

@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: posts
-        image: aldorbregosson/cloudnative-troubleshooting-posts
+        image: aldorbregosson/cloudnative-troubleshooting-posts:0.0.2
         securityContext:
           privileged: true
         env:
