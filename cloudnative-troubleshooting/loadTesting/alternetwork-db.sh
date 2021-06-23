@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/local/bin/bash
 if [ $1 == "add" ]; then
     action="breaking"
 else
@@ -6,5 +6,6 @@ else
 fi
 
 echo "$action connections between posts and mysql"
-kubectl exec mysql-7496bdd68f-gkz58 -- route $1 -host 10.36.1.58 reject
-kubectl exec mysql-7496bdd68f-gkz58 -- route $1 -host 10.36.3.43 reject
+kubectl exec mysql-698d9857bc-4jfnq -- route $1 -host 172.17.0.11 reject
+kubectl exec mysql-698d9857bc-4jfnq -- route $1 -host 172.17.0.12 reject
+
