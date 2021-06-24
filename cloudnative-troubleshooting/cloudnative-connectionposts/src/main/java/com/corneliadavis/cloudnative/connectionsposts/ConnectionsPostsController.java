@@ -70,15 +70,20 @@ public class ConnectionsPostsController implements InitializingBean {
 
     @Value("${connectionpostscontroller.connectionsUrl}")
     private String connectionsUrl;
+    
     @Value("${connectionpostscontroller.postsUrl}")
     private String postsUrl;
+    
     @Value("${connectionpostscontroller.usersUrl}")
     private String usersUrl;
+    
     @Value("${connectionpostscontroller.implementRetries}")
     private String implementRetriesS;
     private Boolean implementRetries = false;
+    
     @Value("${connectionpostscontroller.connectTimeout}")
     private int connectTimeout;
+    
     @Value("${connectionpostscontroller.readTimeout}")
     private int readTimeout;
 

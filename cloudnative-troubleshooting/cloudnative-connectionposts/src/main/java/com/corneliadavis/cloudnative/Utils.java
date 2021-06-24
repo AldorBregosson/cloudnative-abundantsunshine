@@ -15,13 +15,18 @@ public class Utils implements ApplicationContextAware, ApplicationListener<Appli
 
     private ApplicationContext applicationContext;
     private int port;
+    
     @Value("${ipaddress}")
     private String ip;
+    
     @Value("${com.corneliadavis.cloudnative.connections.secrets}")
     private String connectionsSecretsIn;
+    
     private String connectionsSecret;
+    
     @Value("${com.corneliadavis.cloudnative.posts.secrets}")
     private String postsSecretsIn;
+    
     private String postsSecret;
 
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
@@ -33,15 +38,18 @@ public class Utils implements ApplicationContextAware, ApplicationListener<Appli
     }
 
     @Override
-    public void onApplicationEvent(ApplicationEvent applicationEvent) {
-        if (applicationEvent instanceof ServletWebServerInitializedEvent) {
-            ServletWebServerInitializedEvent servletWebServerInitializedEvent
-                    = (ServletWebServerInitializedEvent) applicationEvent;
-            this.port = servletWebServerInitializedEvent.getApplicationContext().getWebServer().getPort();
-        } else if (applicationEvent instanceof ApplicationPreparedEvent) {
+    public void onApplicationEvent(ApplicationEvent evt) {
+        if (evt instanceof ServletWebServerInitializedEvent) {
+            ServletWebServerInitializedEvent wsEvt = (ServletWebServerInitializedEvent) evt;
+            this.port = wsEvt.getApplicationContext()
+                             .getWebServer()
+                             .getPort();
+        } else if (evt instanceof ApplicationPreparedEvent) {
             connectionsSecret = connectionsSecretsIn.split(",")[0];
             postsSecret = postsSecretsIn.split(",")[0];
-            logger.info(ipTag() + "Connection Posts Service initialized with Post secret: " + postsSecret + " and Connections secret: " + connectionsSecret);
+            logger.info(ipTag()
+                + "Connection Posts Service initialized with Post secret: " + postsSecret
+                + " and Connections secret: " + connectionsSecret);
         }
     }
 
@@ -53,6 +61,8 @@ public class Utils implements ApplicationContextAware, ApplicationListener<Appli
         return postsSecret;
     }
 
-    public String ipTag() { return "[" + ip + ":" + port +"] "; }
+    public String ipTag() {
+        return "[" + ip + ":" + port +"] ";
+    }
 
 }
