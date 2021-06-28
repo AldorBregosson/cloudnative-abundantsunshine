@@ -1,13 +1,12 @@
-package com.corneliadavis.cloudnative.connections.sourceoftruth;
+package com.corneliadavis.cloudnative.connectionsposts.projection;
 
 import org.springframework.data.repository.CrudRepository;
 
 /**
- * Created by corneliadavis on 9/4/17.
+ * Created by corneliadavis on 9/4/18.
  */
 public interface ConnectionRepository extends CrudRepository<Connection, Long> {
 
-    Iterable<Connection> findByFollower(Long follower);
-
     Connection findByFollowerAndFollowed(Long follower, Long followed);
+
 }
