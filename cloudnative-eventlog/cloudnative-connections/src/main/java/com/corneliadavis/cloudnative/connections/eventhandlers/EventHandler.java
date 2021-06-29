@@ -15,9 +15,8 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 /**
- * Created by corneliadavis on 11/10/18.
+ * The Event handler for the connections service.
  */
-
 @Component
 public class EventHandler {
 
@@ -35,7 +34,7 @@ public class EventHandler {
     @KafkaListener(topics="user", groupId = "connectionsconsumer", containerFactory = "kafkaListenerContainerFactory")
     public void userEvent(UserEvent userEvent) {
 
-        logger.info("Posts UserEvent Handler processing - event: " + userEvent.getEventType());
+        logger.info("Connections UserEvent Handler processing - event: " + userEvent.getEventType());
 
         if (userEvent.getEventType().equals("created")) {
 
@@ -46,23 +45,24 @@ public class EventHandler {
                 User user = new User(userEvent.getId(), userEvent.getName(), userEvent.getUsername());
                 userRepository.save(user);
 
-                logger.info("New user cached in local storage " + user.getUsername());
+                logger.info("New user cached in local storage: '" + user.getUsername() + "'");
                 userRepository.save(new User(userEvent.getId(), userEvent.getName(), userEvent.getUsername()));
-            } else
-                logger.info("Already existing user not cached again id " + userEvent.getId());
+            } else {
+                logger.info("Already existing user not cached again, id '" + userEvent.getId() + "'");
+            }
         } else if (userEvent.getEventType().equals("updated")) {
-            logger.info("Updating user cached in local storage with username " + userEvent.getUsername());
+            logger.info("Updating user cached in local storage with username '" + userEvent.getUsername() + "'");
             Optional<User> opt = userRepository.findById(userEvent.getId());
             if (opt.isPresent()) {
                 User existingUser = opt.get();
                 existingUser.setName(userEvent.getName());
                 existingUser.setUsername(userEvent.getUsername());
                 userRepository.save(existingUser);
-            } else
+            } else {
                 logger.info("Something is odd - trying to update a user that doesn't existing in the local cache");
+            }
         }
-
-
+        
     }
 
     @KafkaListener(topics="connection", groupId = "connectionsconsumer", containerFactory = "kafkaListenerContainerFactory")
@@ -85,8 +85,9 @@ public class EventHandler {
                 logger.info("deleting from the cache connection: " + existingConnection.getFollower() +
                         " is no longer following " + existingConnection.getFollowed());
                 connectionRepository.delete(existingConnection);
-            } else
+            } else {
                 logger.info("Could not delete cached connection with id ", connectionEvent.getId());
+            }
         }
     }
 

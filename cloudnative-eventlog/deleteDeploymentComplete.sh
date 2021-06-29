@@ -1,5 +1,4 @@
-#!/bin/bash
-
+#!/usr/local/bin/bash
 
 kubectl delete deploy/posts
 kubectl delete deploy/connections

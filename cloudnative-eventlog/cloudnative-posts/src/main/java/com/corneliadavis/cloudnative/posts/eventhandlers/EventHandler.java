@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * The event handler for posts.
+ */
 @Component
 public class EventHandler {
 
@@ -42,16 +45,17 @@ public class EventHandler {
                 User user = new User(userEvent.getId(), userEvent.getUsername());
                 userRepository.save(user);
 
-                logger.info("New user cached in local storage " + user.getUsername());
+                logger.info("New user cached in local storage: '" + user.getUsername() + "'");
             }
         } else if (userEvent.getEventType().equals("updated")) {
-            logger.info("Updating user cached in local storage with username " + userEvent.getUsername());
+            logger.info("Updating user cached in local storage with username '" + userEvent.getUsername() + "'");
             User existingUser = userRepository.findById(userEvent.getId()).get();
             if (existingUser != null) {
                 existingUser.setUsername(userEvent.getUsername());
                 userRepository.save(existingUser);
-            } else
+            } else {
                 logger.info("Something is odd - trying to update a user that doesn't existing in the local cache");
+            }
         }
 
     }
@@ -64,12 +68,13 @@ public class EventHandler {
         if (postEvent.getEventType().equals("created")) {
             Optional<Post> opt = postRepository.findById(postEvent.getId());
             if (!opt.isPresent()) {
-                logger.info("Creating a new post in the cache with title " + postEvent.getTitle());
+                logger.info("Creating a new post in the cache with title '" + postEvent.getTitle() + "'");
                 Post post = new Post(postEvent.getId(), postEvent.getDate(), postEvent.getUserId(),
                         postEvent.getTitle(), postEvent.getBody());
                 postRepository.save(post);
-            } else
+            } else {
                 logger.info("Did not create already cached post with id " + postEvent.getId());
+            }
         }
     }
 }

@@ -40,7 +40,7 @@ public class EventHandler {
     @KafkaListener(topics = "user", groupId = "connectionspostsconsumer", containerFactory = "kafkaListenerContainerFactory")
     public void userEvent(UserEvent userEvent) {
         
-        logger.info("Posts UserEvent Handler processing - event: " + userEvent.getEventType());
+        logger.info("ConnectionsPosts UserEvent Handler processing - event: " + userEvent.getEventType());
         
         if (userEvent.getEventType().equals("created")) {
             

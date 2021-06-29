@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/local/bin/bash
+# loads data into local database
 curl -X POST -H "Content-Type:application/json" --data '{"name":"Cornelia","username":"cdavisafc"}' localhost:8081/users
 curl -X POST -H "Content-Type:application/json" --data '{"name":"Max","username":"madmax"}' localhost:8081/users
 curl -X POST -H "Content-Type:application/json" --data '{"name":"Glen","username":"gmaxdavis"}' localhost:8081/users
