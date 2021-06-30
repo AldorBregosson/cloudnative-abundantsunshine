@@ -60,8 +60,14 @@ public class ConnectionsWriteController {
     @RequestMapping(method = RequestMethod.PUT, value = "/users/{username}")
     public void updateUser(@PathVariable("username") String username, @RequestBody User newUser, HttpServletResponse response) {
         
-        logger.info("Event: Updated user with username " + username);
+        logger.info("Event: Updated user with username '" + username + "'");
         User user = userRepository.findByUsername(username);
+        // avoid an NPE.
+        if (user == null) {
+            logger.info("No user with username '" + username + "' found in database.");
+            logger.warn("Can't update nonexistent user.");
+            return;
+        }
         
         // send event to Kafka
         UserEvent userEvent =
