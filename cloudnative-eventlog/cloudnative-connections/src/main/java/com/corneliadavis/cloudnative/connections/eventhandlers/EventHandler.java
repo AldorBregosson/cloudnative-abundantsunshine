@@ -17,7 +17,6 @@ import java.util.Optional;
 /**
  * Handles events of the connections service.
  */
-
 @Component
 public class EventHandler {
     

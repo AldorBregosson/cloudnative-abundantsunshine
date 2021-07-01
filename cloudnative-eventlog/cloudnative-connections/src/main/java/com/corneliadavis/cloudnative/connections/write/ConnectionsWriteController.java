@@ -64,7 +64,6 @@ public class ConnectionsWriteController {
         
         logger.info("Event: Updating user with username '" + username + "'");
         User user = userRepository.findByUsername(username);
-        
         // avoid NPE on update.
         if (user == null) {
             logger.warn("Can't update nonexistent user '" + username + "'");
@@ -111,8 +110,9 @@ public class ConnectionsWriteController {
         Long followerId = userRepository.findByUsername(followerUsername).getId();
         Long followedId = userRepository.findByUsername(followedUsername).getId();
         Connection connection = connectionRepository.findByFollowerAndFollowed(followerId, followedId);
-        if (connection == null)
+        if (connection == null) {
             logger.info("unable to find or delete that connection");
+        }
         else {
             // send event to Kafka
             ConnectionEvent connectionEvent = new ConnectionEvent();
