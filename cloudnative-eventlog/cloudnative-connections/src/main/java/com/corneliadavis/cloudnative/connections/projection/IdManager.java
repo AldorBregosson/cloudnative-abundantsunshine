@@ -13,6 +13,10 @@ import org.springframework.context.ApplicationListener;
 
 import java.util.List;
 
+/**
+ *  ID generation is moved out of the database because we want to assign an ID
+ *  when the event is produced, not when the projection is created.
+ */
 public class IdManager implements ApplicationContextAware, ApplicationListener<ApplicationEvent> {
     private Long maxUserId;
     private Long maxConnectionId;
@@ -48,7 +52,7 @@ public class IdManager implements ApplicationContextAware, ApplicationListener<A
                 this.maxConnectionId = 0L;
             else
                 this.maxConnectionId = max.get(0);
-
+            
         }
     }
 

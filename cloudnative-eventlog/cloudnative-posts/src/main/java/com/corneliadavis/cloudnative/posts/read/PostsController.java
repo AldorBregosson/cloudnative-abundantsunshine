@@ -64,7 +64,7 @@ public class PostsController {
                 ArrayList<IPostApi> postsForUsers = new ArrayList<IPostApi>();
                 String username[] = usernames.split(",");
                 for (int i = 0; i < username.length; i++) {
-                    logger.info(utils.ipTag() + "getting posts for username " + username[i]);
+                    logger.info(utils.ipTag() + "getting posts for username '" + username[i] + "'");
                     posts = postRepository.findByUsername(username[i]);
                     posts.forEach(post -> postsForUsers.add(post));
                 }

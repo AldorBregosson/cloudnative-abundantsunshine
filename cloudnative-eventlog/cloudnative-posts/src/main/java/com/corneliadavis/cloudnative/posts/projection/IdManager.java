@@ -10,15 +10,22 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ *  ID generation is moved out of the database because we want to assign an ID
+ *  when the event is produced, not when the projection is created.
+ */
 public class IdManager implements ApplicationContextAware, ApplicationListener<ApplicationEvent> {
+    
     private Long maxId;
 
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
     private ApplicationContext applicationContext;
+    
     //private PostRepository postRepository;
 
     @Autowired
