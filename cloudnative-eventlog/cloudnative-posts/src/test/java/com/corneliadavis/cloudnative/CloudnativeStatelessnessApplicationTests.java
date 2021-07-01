@@ -20,13 +20,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CloudnativeApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)
 @TestPropertySource(properties = {
-        "spring.cloud.config.enabled:false",
-        "connectionspostscontroller.url:http://localhost:9999"})
+    "spring.cloud.config.enabled:false",
+    "connectionspostscontroller.url:http://localhost:9999",
+    "kafka.bootstrap-servers=127.0.0.1:9092"
+})
 @AutoConfigureMockMvc
 @DirtiesContext
 public class CloudnativeStatelessnessApplicationTests implements ApplicationContextAware {
@@ -40,53 +44,53 @@ public class CloudnativeStatelessnessApplicationTests implements ApplicationCont
             return app;
         }
     }*/
-
+    
     private ApplicationContext applicationContext;
+    @Autowired
+    private MockMvc mockMvc;
+    
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-
-    @Autowired
-    private  MockMvc mockMvc;
-
+    
     @Before
     public void loadData() throws InterruptedException {
         RepositoriesPopulator rp = applicationContext.getBean(RepositoriesPopulator.class);
         rp.populate();
     }
-
+    
     @Test
     public void contextLoads() {
     }
-
+    
     @Test
-    public void	actuator() throws Exception {
-
+    public void actuator() throws Exception {
+        
         mockMvc.perform(get("/actuator/env"))
-                .andExpect(status().isOk());
+            .andExpect(status().isOk());
     }
-
+    
     @Test
-    public void	checkPostCounts() throws Exception {
-
+    public void checkPostCounts() throws Exception {
+        
         mockMvc.perform(get("/posts"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(jsonPath("$", hasSize(4)));
-
+            .andExpect(status().isOk())
+            .andExpect(content().contentType("application/json;charset=UTF-8"))
+            .andExpect(jsonPath("$", hasSize(4)));
+        
     }
-
+    
     @Test
-    public void	testHealthSimulation() throws Exception {
-
+    public void testHealthSimulation() throws Exception {
+        
         mockMvc.perform(post("/infect"))
-                .andExpect(status().isOk());
+            .andExpect(status().isOk());
         mockMvc.perform(post("/heal"))
-                .andExpect(status().isOk());
+            .andExpect(status().isOk());
         //mockMvc.perform(get("/healthz"))
         //        .andExpect(status().isOk());
         // With the latest implementation will simply sleep for a long time after infected.
-
+        
     }
 }

@@ -12,49 +12,55 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CloudnativeApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)
+@TestPropertySource(properties = {
+    "kafka.bootstrap-servers=127.0.0.1:9092" // necessary for consumers.
+})
 @AutoConfigureMockMvc
 public class CloudnativeEventDrivenTests implements ApplicationContextAware {
-
+    
     private ApplicationContext applicationContext;
+    @Autowired
+    private MockMvc mockMvc;
+    
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-
-	@Autowired
-	private  MockMvc mockMvc;
-
-	@Before
+    
+    @Before
     public void loadData() {
         RepositoriesPopulator rp = applicationContext.getBean(RepositoriesPopulator.class);
         rp.populate();
     }
-
-	@Test
-	public void contextLoads() {
-	}
-
-	@Test
-	public void	actuator() throws Exception {
-
-		mockMvc.perform(get("/actuator/env"))
-				.andExpect(status().isOk());
-	}
-
+    
     @Test
-    public void	checkNewPostCounts() throws Exception {
+    public void contextLoads() {
+    }
+    
+    @Test
+    public void actuator() throws Exception {
+        
+        mockMvc.perform(get("/actuator/env"))
+            .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void checkNewPostCounts() throws Exception {
         mockMvc.perform(get("/connectionsposts/cdavisafc"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(jsonPath("$", hasSize(2)));
-	}
+            .andExpect(status().isOk())
+            .andExpect(content().contentType("application/json;charset=UTF-8"))
+            .andExpect(jsonPath("$", hasSize(2)));
+    }
 }

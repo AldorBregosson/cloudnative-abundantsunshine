@@ -18,57 +18,62 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CloudnativeApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)
 @TestPropertySource(properties = {
-		"connectionspostscontroller.url:http://localhost:9999",
-		"postscontroller.url:http://localhost:9999"})
+    "connectionspostscontroller.url:http://localhost:9999",
+    "postscontroller.url:http://localhost:9999",
+    "kafka.bootstrap-servers=127.0.0.1:9092" // necessary for consumers.
+})
 @AutoConfigureMockMvc
 public class CloudnativeEventDrivenTests implements ApplicationContextAware {
-
-	private ApplicationContext applicationContext;
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.applicationContext = applicationContext;
-	}
-
-	@Autowired
-	private  MockMvc mockMvc;
-
-	@Before
-	public void loadData() {
-		RepositoriesPopulator rp = applicationContext.getBean(RepositoriesPopulator.class);
-		rp.populate();
-	}
-
-	@Test
-	public void contextLoads() {
-	}
-
-	@Test
-	public void	actuator() throws Exception {
-
-		mockMvc.perform(get("/actuator/env"))
-				.andExpect(status().isOk());
-	}
-
-
-	@Test
-	public void	checkUserCounts() throws Exception {
-        mockMvc.perform(get("/users"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(jsonPath("$", hasSize(3)));
+    
+    private ApplicationContext applicationContext;
+    @Autowired
+    private MockMvc mockMvc;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
+    
+    @Before
+    public void loadData() {
+        RepositoriesPopulator rp = applicationContext.getBean(RepositoriesPopulator.class);
+        rp.populate();
+    }
+    
     @Test
-    public void	checkConnectionCounts() throws Exception {
-        mockMvc.perform(get("/connections"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(jsonPath("$", hasSize(3)));
-
+    public void contextLoads() {
     }
-
+    
+    @Test
+    public void actuator() throws Exception {
+        
+        mockMvc.perform(get("/actuator/env"))
+            .andExpect(status().isOk());
+    }
+    
+    
+    @Test
+    public void checkUserCounts() throws Exception {
+        mockMvc.perform(get("/users"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType("application/json;charset=UTF-8"))
+            .andExpect(jsonPath("$", hasSize(3)));
+    }
+    
+    @Test
+    public void checkConnectionCounts() throws Exception {
+        mockMvc.perform(get("/connections"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType("application/json;charset=UTF-8"))
+            .andExpect(jsonPath("$", hasSize(3)));
+        
+    }
+    
 }
